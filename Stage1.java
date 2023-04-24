@@ -18,12 +18,82 @@ public class Stage1 {
 		generateField();
 		printField();
 		placementOfAircraftCarrier();
-		placementOfBattleship();
-		placementOfSubmarine();
-		placementOfCruiser();
-		placementOfDestroyer();
+//		placementOfBattleship();
+//		placementOfSubmarine();
+//		placementOfCruiser();
+//		placementOfDestroyer();
+		
+		
+		gameStart();
+		
+		takeShot();
 
 	}
+/////////////////////////////////////////////	
+	// Start the Game
+	private static void gameStart() {
+		// TODO Auto-generated method stub
+		System.out.println();
+		System.out.println("The game starts!");
+		printField();
+		
+	}
+/////////////////////////////////////////////
+	// Take a shot
+	private static void takeShot() {
+		System.out.println();
+		System.out.println("Take a shot!");
+
+		Scanner scanner = new Scanner(System.in);
+		int fireCoordV = 0; 
+		int fireCoordH = 0;
+
+		// start check of fire coordinate (enter something like "A1"):
+		boolean noErrors = false;
+
+		// do while there are errors...
+		do {
+
+			String fireCoordinate = scanner.next(); // fire coordinate
+
+			// beginShip contains wrong characters?
+			if (fireCoordinate.matches("[A-J][1-9][0]?")) {
+				noErrors = true;
+			} else {
+				noErrors = false;
+				System.out.println();
+				System.out.println("Error! You entered the wrong coordinates! Try again:\n");
+				continue;
+			}
+			
+			fireCoordV = (int) fireCoordinate.charAt(0) - 64; 
+			// vertical coordinate, first char A-J, getting char number
+
+			fireCoordH = Integer.parseInt(fireCoordinate.replaceAll("[^0-9]", "")); 
+			// horizontal coordinate, replacing all non numbers and convert to int
+			
+
+		} while (!noErrors);
+		
+		if (field[fireCoordV][fireCoordH] == "~") {
+			field[fireCoordV][fireCoordH] = "M";
+			printField();
+			System.out.println();
+			System.out.println("You missed!");
+		} else if (field[fireCoordV][fireCoordH] == "O") {
+			field[fireCoordV][fireCoordH] = "X";
+			printField();
+			System.out.println();
+			System.out.println("You hit a ship!");
+		}
+		
+		
+		
+		
+
+	}
+	
+/////////////////////////////////////////////
 
 	// BEGINNING OF GAME - new 10x10 field generation\
 	private static void generateField() {
@@ -46,6 +116,8 @@ public class Stage1 {
 				}
 			}
 		}
+		
+		
 
 	}
 
