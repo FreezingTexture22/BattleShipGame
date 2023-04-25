@@ -2,7 +2,7 @@ package Battleship;
 
 import java.util.Scanner;
 
-public class Stage1 {
+public class Stage2 {
 	// field for game, 10 x 10 plus coordinates
 	static String[][] field = new String[11][11];
 
@@ -18,34 +18,35 @@ public class Stage1 {
 		generateField();
 		printField();
 		placementOfAircraftCarrier();
-//		placementOfBattleship();
-//		placementOfSubmarine();
-//		placementOfCruiser();
-//		placementOfDestroyer();
-		
-		
+		placementOfBattleship();
+		placementOfSubmarine();
+		placementOfCruiser();
+		placementOfDestroyer();
+
 		gameStart();
-		
+
 		takeShot();
 
 	}
+
 /////////////////////////////////////////////	
 	// Start the Game
 	private static void gameStart() {
-		// TODO Auto-generated method stub
 		System.out.println();
 		System.out.println("The game starts!");
 		printField();
-		
+
 	}
+
 /////////////////////////////////////////////
 	// Take a shot
 	private static void takeShot() {
 		System.out.println();
 		System.out.println("Take a shot!");
+		System.out.println();
 
 		Scanner scanner = new Scanner(System.in);
-		int fireCoordV = 0; 
+		int fireCoordV = 0;
 		int fireCoordH = 0;
 
 		// start check of fire coordinate (enter something like "A1"):
@@ -65,16 +66,15 @@ public class Stage1 {
 				System.out.println("Error! You entered the wrong coordinates! Try again:\n");
 				continue;
 			}
-			
-			fireCoordV = (int) fireCoordinate.charAt(0) - 64; 
+
+			fireCoordV = (int) fireCoordinate.charAt(0) - 64;
 			// vertical coordinate, first char A-J, getting char number
 
-			fireCoordH = Integer.parseInt(fireCoordinate.replaceAll("[^0-9]", "")); 
+			fireCoordH = Integer.parseInt(fireCoordinate.replaceAll("[^0-9]", ""));
 			// horizontal coordinate, replacing all non numbers and convert to int
-			
 
 		} while (!noErrors);
-		
+
 		if (field[fireCoordV][fireCoordH] == "~") {
 			field[fireCoordV][fireCoordH] = "M";
 			printField();
@@ -86,13 +86,9 @@ public class Stage1 {
 			System.out.println();
 			System.out.println("You hit a ship!");
 		}
-		
-		
-		
-		
 
 	}
-	
+
 /////////////////////////////////////////////
 
 	// BEGINNING OF GAME - new 10x10 field generation\
@@ -116,8 +112,6 @@ public class Stage1 {
 				}
 			}
 		}
-		
-		
 
 	}
 
@@ -171,7 +165,6 @@ public class Stage1 {
 		System.out.println();
 		System.out.println();
 		int shipSize = ship.getShipSize();
-		
 
 		// start check (enter something like "A1 A5"):
 		boolean noErrors = false;
@@ -243,7 +236,7 @@ public class Stage1 {
 
 			// is ship legal size?
 			if (endShip1 - beginShip1 + 1 == shipSize || endShip2 - beginShip2 + 1 == shipSize) {
-				noErrors = true;			
+				noErrors = true;
 			} else {
 				System.out.println();
 				System.out.printf("Error! Wrong length of the %s! Try again:\n", ship.getShipType());
@@ -301,11 +294,11 @@ public class Stage1 {
 
 			// is too close to another ships?
 			boolean isTooClose = false;
-			
+
 //			System.out.println("is too close to another ships?");
 //			System.out.println("horizontal = " + horizontal);
 //			System.out.println("vertical = " + vertical);
-			
+
 			if (horizontal == true && endShip2 == 10 && beginShip1 != 10) {
 				for (int i = beginShip2; i <= endShip2; i++) {
 					if (field[beginShip1 - 1][i].equals("O") || field[beginShip1 + 1][i].equals("O")
@@ -373,21 +366,18 @@ public class Stage1 {
 
 			} else if (vertical == true && endShip1 != 10 && beginShip2 != 10) {
 
-				if (
-						field[beginShip1 - 1][beginShip2 - 1].equals("O") 
-						|| field[beginShip1 - 1][beginShip2].equals("O")
+				if (field[beginShip1 - 1][beginShip2 - 1].equals("O") || field[beginShip1 - 1][beginShip2].equals("O")
 						|| field[beginShip1 - 1][beginShip2 + 1].equals("O")
-						
+
 						|| field[endShip1 + 1][beginShip2 - 1].equals("O")
 						|| field[endShip1 + 1][beginShip2].equals("O")
 						|| field[endShip1 + 1][beginShip2 + 1].equals("O")
-						
-						) 
-				{
+
+				) {
 //					System.out.println("CASE 5");
 					noErrors = false;
 					isTooClose = true;
-					
+
 				}
 
 				for (int i = beginShip1; i <= endShip1; i++) {
@@ -409,7 +399,7 @@ public class Stage1 {
 //					System.out.println("CASE 7");
 					noErrors = false;
 					isTooClose = true;
-					
+
 				}
 
 				for (int i = beginShip1; i <= endShip1; i++) {
@@ -433,7 +423,7 @@ public class Stage1 {
 //					System.out.println("CASE 9");
 					noErrors = false;
 					isTooClose = true;
-					
+
 				}
 
 				for (int i = beginShip1; i <= endShip1; i++) {
@@ -457,7 +447,7 @@ public class Stage1 {
 //					System.out.println("CASE 11");
 					noErrors = false;
 					isTooClose = true;
-					
+
 				}
 
 				for (int i = beginShip1; i <= endShip1; i++) {
@@ -477,7 +467,7 @@ public class Stage1 {
 			if (isTooClose == true) {
 				System.out.println();
 				System.out.println("Error! You placed it too close to another one. Try again: \n");
-				
+
 			}
 
 			// write ship on game field
@@ -494,8 +484,6 @@ public class Stage1 {
 				}
 				printField();
 			}
-
-			
 
 		} while (!noErrors);
 
