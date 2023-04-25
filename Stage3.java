@@ -2,7 +2,7 @@ package Battleship;
 
 import java.util.Scanner;
 
-public class Stage2 {
+public class Stage3 {
 	// field for game, 10 x 10 plus coordinates
 	static String[][] field = new String[11][11];
 
@@ -17,15 +17,33 @@ public class Stage2 {
 	public static void main(String[] args) {
 		generateField();
 		printField();
+//		firstPrintField();
 		placementOfAircraftCarrier();
 		placementOfBattleship();
 		placementOfSubmarine();
 		placementOfCruiser();
 		placementOfDestroyer();
-
+		
 		gameStart();
 
 		takeShot();
+
+	}
+
+	private static void fogOfWar() {
+
+		System.out.println();
+		for (int i = 0; i <= 10; i++) {
+			for (int j = 0; j <= 10; j++) {
+				if (field[i][j].equals("O")) {
+					System.out.print("~ ");
+				} else {
+					System.out.print(field[i][j] + " ");
+				}
+
+			}
+			System.out.println();
+		}
 
 	}
 
@@ -34,7 +52,7 @@ public class Stage2 {
 	private static void gameStart() {
 		System.out.println();
 		System.out.println("The game starts!");
-		printField();
+		fogOfWar();
 
 	}
 
@@ -77,14 +95,17 @@ public class Stage2 {
 
 		if (field[fireCoordV][fireCoordH] == "~") {
 			field[fireCoordV][fireCoordH] = "M";
-			printField();
+			fogOfWar();
 			System.out.println();
 			System.out.println("You missed!");
+			printField();
+			
 		} else if (field[fireCoordV][fireCoordH] == "O") {
 			field[fireCoordV][fireCoordH] = "X";
-			printField();
+			fogOfWar();
 			System.out.println();
 			System.out.println("You hit a ship!");
+			printField();
 		}
 
 	}
@@ -125,6 +146,18 @@ public class Stage2 {
 			System.out.println();
 		}
 	}
+	
+//	// FIRST PRINT FIELD
+//	private static void firstPrintField() {
+//		System.out.println();
+//		System.out.println("1 2 3 4 5 6 7 8 9 10");
+//		for (int i = 1; i <= 10; i++) {
+//			for (int j = 0; j <= 10; j++) {
+//				System.out.print(field[i][j] + " ");
+//			}
+//			System.out.println();
+//		}
+//	}
 
 /////////////////////////////////////////////
 
@@ -209,18 +242,14 @@ public class Stage2 {
 				int tmp = beginShip1;
 				beginShip1 = endShip1;
 				endShip1 = tmp;
-//				System.out.println("Changing beginShip1 and endShip1:");
-//				System.out.println("beginShip1 = " + beginShip1);
-//				System.out.println("endShip1 = " + endShip1);
+
 			}
 
 			if (beginShip2 > endShip2) {
 				int tmp = beginShip2;
 				beginShip2 = endShip2;
 				endShip2 = tmp;
-//				System.out.println("Changing beginShip2 and endShip2:");
-//				System.out.println("beginShip2 = " + beginShip2);
-//				System.out.println("endShip2 = " + endShip2);
+
 			}
 
 			// is orthogonal?
@@ -258,10 +287,10 @@ public class Stage2 {
 			// in horizontal or vertical position?
 			if (beginShip1 == endShip1) {
 				horizontal = true;
-//				System.out.println("Ship is in horizontal position");
+
 			} else if (beginShip2 == endShip2) {
 				vertical = true;
-//				System.out.println("Ship is in vertical position");
+
 			}
 
 			// is place available?
@@ -294,10 +323,6 @@ public class Stage2 {
 
 			// is too close to another ships?
 			boolean isTooClose = false;
-
-//			System.out.println("is too close to another ships?");
-//			System.out.println("horizontal = " + horizontal);
-//			System.out.println("vertical = " + vertical);
 
 			if (horizontal == true && endShip2 == 10 && beginShip1 != 10) {
 				for (int i = beginShip2; i <= endShip2; i++) {
