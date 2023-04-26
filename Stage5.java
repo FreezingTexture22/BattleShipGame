@@ -1,51 +1,92 @@
 package Battleship;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Stage5 {
-
-	
-
-		
-	
 	public static void main(String[] args) {
+		boolean gameEnded = false;
+
 		Player p1 = new Player("Player 1");
 		Player p2 = new Player("Player 2");
 
+		// Player 1 board generation
+		System.out.println("Player 1, place your ships on the game field");
+		System.out.println();
 		p1.generateField();
-		p2.generateField();
-		
-		
 		p1.printField();
-//		p1.placementOfAircraftCarrier();
-//		p1.placementOfBattleship();
-//		p1.placementOfSubmarine();
-//		p1.placementOfCruiser();
+
+		// Player 1 ship placement
+		p1.placementOfAircraftCarrier();
+		p1.placementOfBattleship();
+		p1.placementOfSubmarine();
+		p1.placementOfCruiser();
 		p1.placementOfDestroyer();
-		
-		p1.gameStart();
-		
-		do {
-			p1.takeShot();
-		} while (p1.notSinkedShips != 0);
-		
+
+		promptEnterKey(); // Press Enter and pass the move to another player
+
+		// Player 2 board generation
+		System.out.println("Player 2, place your ships on the game field");
+		System.out.println();
+		p2.generateField();
 		p2.printField();
-//		p2.placementOfAircraftCarrier();
-//		p2.placementOfBattleship();
-//		p2.placementOfSubmarine();
-//		p2.placementOfCruiser();
+
+		// Player 2 ship placement
+		p2.placementOfAircraftCarrier();
+		p2.placementOfBattleship();
+		p2.placementOfSubmarine();
+		p2.placementOfCruiser();
 		p2.placementOfDestroyer();
-		
-		p2.gameStart();
-		
+
+		//
+		// GAME START
+
+		promptEnterKey(); // Press Enter and pass the move to another player
+
+		p1.gameStart();
 		do {
-			p2.takeShot();
-		} while (p2.notSinkedShips != 0);
-		
+
+			p1.takeShot(p2); // Player 1 shoots
+
+			if (p2.notSinkedShips == 0) {
+				System.out.println("Player 1 wins!");
+				gameEnded = true;
+				continue;
+			}
+
+			promptEnterKey(); // Press Enter and pass the move to another player
+
+			p2.takeShot(p1); // Player 2 shoots
+
+			if (p1.notSinkedShips == 0) {
+				System.out.println("Player 2 wins!");
+				gameEnded = true;
+				continue;
+			}
+
+			promptEnterKey(); // Press Enter and pass the move to another player
+
+		} while (gameEnded != true);
+
 	}
 
-}
+//////////////////////////////////////////////////
+//Press ENTER to pass turn to another player
 
+	static void promptEnterKey() {
+		System.out.println();
+		System.out.println("Press Enter and pass the move to another player");
+		try {
+			System.in.read();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+// promptEnterKey END
+/////////////////////////////////////////////
+
+}
 
 ///
 ///
@@ -53,19 +94,18 @@ public class Stage5 {
 
 class Player {
 	String name;
-	
+
 	// some vars
 	String[][] field = new String[11][11];
-	int notSinkedShips = 1; // Quantity of ships on board, change as needed
-	static boolean isFirstRound = true;
-	
+	int notSinkedShips = 5; // Quantity of ships on board, change as needed
+
 	// creating ships from ENUM
 	static Ship aircraftCarrier = Ship.ACARRIER;
 	static Ship battleship = Ship.BATTLESHIP;
 	static Ship submarine = Ship.SUBMARINE;
 	static Ship cruiser = Ship.CRUISER;
 	static Ship destroyer = Ship.DESTROYER;
-		
+
 	Player(String name) {
 		this.name = name;
 	}
@@ -110,18 +150,18 @@ class Player {
 	}
 ///
 /////////////////////////////////////////////
-	
+
 //////////////////////////////////////////////////
 /// print out field - ships hidden!
-	void fogOfWar() {
+	void fogOfWar(Player target) {
 
 		System.out.println();
 		for (int i = 0; i <= 10; i++) {
 			for (int j = 0; j <= 10; j++) {
-				if (field[i][j].equals("O")) {
+				if (target.field[i][j].equals("O")) {
 					System.out.print("~ ");
 				} else {
-					System.out.print(field[i][j] + " ");
+					System.out.print(target.field[i][j] + " ");
 				}
 			}
 
@@ -132,13 +172,12 @@ class Player {
 
 ///
 /////////////////////////////////////////////
-	
+
 //////////////////////////////////////////////////
 // Start the Game
 	void gameStart() {
 		System.out.println();
 		System.out.println("The game starts!");
-		fogOfWar();
 
 	}
 ///
@@ -146,14 +185,14 @@ class Player {
 
 //////////////////////////////////////////////////
 // Take a shot
-	void takeShot() {
-		System.out.println();
+	void takeShot(Player target) {
 
-		if (isFirstRound == true) {
-			System.out.println("Take a shot!");
-			System.out.println();
-			isFirstRound = false;
-		}
+		fogOfWar(target);
+		System.out.println("---------------------");
+		printField();
+		System.out.println();
+		System.out.printf("%s, it's your turn:", name);
+		System.out.println();
 
 		Scanner scanner = new Scanner(System.in);
 		int fireCoordV = 0;
@@ -176,62 +215,60 @@ class Player {
 				System.out.println("Error! You entered the wrong coordinates! Try again:\n");
 				continue;
 			}
-			
+
 			// vertical coordinate, first char A-J, getting char number
 			fireCoordV = (int) fireCoordinate.charAt(0) - 64;
 
 			// horizontal coordinate, replacing all non numbers and convert to int
 			fireCoordH = Integer.parseInt(fireCoordinate.replaceAll("[^0-9]", ""));
 
-
 		} while (!noErrors);
 
-		if (field[fireCoordV][fireCoordH] == "~" || field[fireCoordV][fireCoordH] == "M") {
-			field[fireCoordV][fireCoordH] = "M";
-			fogOfWar();
-			System.out.println();
-			System.out.println("You missed. Try again:");
+		if (target.field[fireCoordV][fireCoordH] == "~" || target.field[fireCoordV][fireCoordH] == "M") {
+			target.field[fireCoordV][fireCoordH] = "M";
 
-		} else if (field[fireCoordV][fireCoordH] == "X") {
-			fogOfWar();
+			System.out.println();
+			System.out.println("You missed!");
+
+		} else if (target.field[fireCoordV][fireCoordH] == "X") {
+
 			hitShip();
 
-		} else if (field[fireCoordV][fireCoordH] == "O") {
-			field[fireCoordV][fireCoordH] = "X";
-			fogOfWar();
+		} else if (target.field[fireCoordV][fireCoordH] == "O") {
+			target.field[fireCoordV][fireCoordH] = "X";
 
 			if (fireCoordV == 10 && fireCoordH == 10) {
-				if (field[fireCoordV - 1][fireCoordH].matches("[^O]")
-						&& field[fireCoordV][fireCoordH - 1].matches("[^O]")) {
-					sinkShip();
+				if (target.field[fireCoordV - 1][fireCoordH].matches("[^O]")
+						&& target.field[fireCoordV][fireCoordH - 1].matches("[^O]")) {
+					sinkShip(target);
 				} else {
 					hitShip();
 				}
 
 			} else if (fireCoordV == 10) {
-				if (field[fireCoordV - 1][fireCoordH].matches("[^O]")
-						&& field[fireCoordV][fireCoordH - 1].matches("[^O]")
-						&& field[fireCoordV][fireCoordH + 1].matches("[^O]")) {
-					sinkShip();
+				if (target.field[fireCoordV - 1][fireCoordH].matches("[^O]")
+						&& target.field[fireCoordV][fireCoordH - 1].matches("[^O]")
+						&& target.field[fireCoordV][fireCoordH + 1].matches("[^O]")) {
+					sinkShip(target);
 				} else {
 					hitShip();
 				}
 
 			} else if (fireCoordH == 10) {
-				if (field[fireCoordV - 1][fireCoordH].matches("[^O]")
-						&& field[fireCoordV + 1][fireCoordH].matches("[^O]")
-						&& field[fireCoordV][fireCoordH - 1].matches("[^O]")) {
-					sinkShip();
+				if (target.field[fireCoordV - 1][fireCoordH].matches("[^O]")
+						&& target.field[fireCoordV + 1][fireCoordH].matches("[^O]")
+						&& target.field[fireCoordV][fireCoordH - 1].matches("[^O]")) {
+					sinkShip(target);
 				} else {
 					hitShip();
 				}
 
 			} else if (fireCoordV != 10 && fireCoordH != 10) {
-				if (field[fireCoordV - 1][fireCoordH].matches("[^O]")
-						&& field[fireCoordV + 1][fireCoordH].matches("[^O]")
-						&& field[fireCoordV][fireCoordH - 1].matches("[^O]")
-						&& field[fireCoordV][fireCoordH + 1].matches("[^O]")) {
-					sinkShip();
+				if (target.field[fireCoordV - 1][fireCoordH].matches("[^O]")
+						&& target.field[fireCoordV + 1][fireCoordH].matches("[^O]")
+						&& target.field[fireCoordV][fireCoordH - 1].matches("[^O]")
+						&& target.field[fireCoordV][fireCoordH + 1].matches("[^O]")) {
+					sinkShip(target);
 				} else {
 					hitShip();
 				}
@@ -248,21 +285,24 @@ class Player {
 //Print message - ship hit	
 	static void hitShip() {
 		System.out.println();
-		System.out.println("You hit a ship! Try again:");
+		System.out.println("You hit a ship!");
 
 	}
-	
+
 ///
 /////////////////////////////////////////////	
 
 //////////////////////////////////////////////////
 //Sink a ship	
-	void sinkShip() {
-		notSinkedShips--;
+	void sinkShip(Player target) {
+		target.notSinkedShips--;
 
-		if (notSinkedShips == 0) {
+		System.out.println("target.notSinkedShips " + target.notSinkedShips);
+
+		if (target.notSinkedShips == 0) {
 			System.out.println();
 			System.out.println("You sank the last ship. You won. Congratulations!");
+
 		} else {
 			System.out.println();
 			System.out.println("You sank a ship! Specify a new target:");
@@ -271,36 +311,35 @@ class Player {
 	}
 ///
 /////////////////////////////////////////////
-	
+
 /////////////////////////////////////////////
 
 // Aircraft Carrier placement
-void placementOfAircraftCarrier() {
-enterCoordinates(aircraftCarrier);
-}
+	void placementOfAircraftCarrier() {
+		enterCoordinates(aircraftCarrier);
+	}
 
 // Battleship placement
-void placementOfBattleship() {
-enterCoordinates(battleship);
-}
+	void placementOfBattleship() {
+		enterCoordinates(battleship);
+	}
 
 // Submarine placement
-void placementOfSubmarine() {
-enterCoordinates(submarine);
-}
+	void placementOfSubmarine() {
+		enterCoordinates(submarine);
+	}
 
 // Cruiser placement
-void placementOfCruiser() {
-enterCoordinates(cruiser);
-}
+	void placementOfCruiser() {
+		enterCoordinates(cruiser);
+	}
 
 // Destroyer placement
-void placementOfDestroyer() {
-enterCoordinates(destroyer);
-}
+	void placementOfDestroyer() {
+		enterCoordinates(destroyer);
+	}
 
 /////////////////////////////////////////////
-
 
 //////////////////////////////////////////////////
 //coordinates input ("A1 A5")
@@ -631,12 +670,8 @@ enterCoordinates(destroyer);
 /// end of coordinates input
 /////////////////////////////////////////////	
 
-	
-/// CLASS END
 }
-
-
-
+/// CLASS END
 
 enum Ships {
 
